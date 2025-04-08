@@ -24,6 +24,7 @@ export const typeDefs = gql`
     currentPage: Int!
   }
 
+
   type Query {
     # Définition de la query getUser, attend un argument id de type Int
     getUser(id: Int!): User

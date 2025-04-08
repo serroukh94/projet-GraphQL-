@@ -20,7 +20,7 @@ export const userResolvers = {
     /**
      * Récupère un utilisateur par son ID.
      */
-    getUser: async ( args: { id: number }, context: { user?: { id: number } }): Promise<User> => {
+    getUser: async (_: unknown, args: { id: number }, context: { user?: { id: number } }): Promise<User> => {
       const { id } = args;
       const foundUser = await prisma.user.findUnique({
         where: { id },
@@ -35,7 +35,7 @@ export const userResolvers = {
     /**
      * Récupère une liste paginée d'utilisateurs.
      */
-    getUsers: async ( args: { page?: number }): Promise<{
+    getUsers: async (_: unknown, args: { page?: number }): Promise<{
       users: User[];
       total: number;
       totalPages: number;
@@ -68,7 +68,7 @@ export const userResolvers = {
     /**
      * Inscription d'un nouvel utilisateur.
      */
-    signup: async ( args: { email: string; password: string; name?: string }): Promise<string> => {
+    signup: async (_: unknown, args: { email: string; password: string; name?: string }): Promise<string> => {
       const email = args.email.toLowerCase();
 
       if (!args.email || !args.password) {
@@ -95,7 +95,7 @@ export const userResolvers = {
     /**
      * Authentifie un utilisateur.
      */
-    login: async ( args: { email: string; password: string; getToken?: boolean }): Promise<string | Omit<User, 'password'>> => {
+    login: async (_: unknown, args: { email: string; password: string; getToken?: boolean }): Promise<string | Omit<User, 'password'>> => {
       const email = args.email.toLowerCase();
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
@@ -118,7 +118,7 @@ export const userResolvers = {
     /**
      * Met à jour les informations d'un utilisateur.
      */
-    updateUser: async ( args: { id: number; data: Partial<{ email: string; name: string }> }, context: { user?: { id: number } }): Promise<User> => {
+    updateUser: async (_: unknown, args: { id: number; data: Partial<{ email: string; name: string }> }, context: { user?: { id: number } }): Promise<User> => {
       const userId = args.id;
       if (context.user?.id !== userId) {
         throw new Error("Vous n'avez pas la permission de mettre à jour cet utilisateur.");
@@ -142,6 +142,7 @@ export const userResolvers = {
         data: {
           email: args.data.email ? args.data.email.toLowerCase() : undefined,
           name: args.data.name,
+          // Ajoutez d'autres champs à mettre à jour si nécessaire.
         },
       });
 
@@ -151,7 +152,7 @@ export const userResolvers = {
     /**
      * Supprime un utilisateur.
      */
-    deleteUser: async ( args: { id: number }, context: { user?: { id: number } }): Promise<{ message: string }> => {
+    deleteUser: async (_: unknown, args: { id: number }, context: { user?: { id: number } }): Promise<{ message: string }> => {
       const userId = args.id;
       if (context.user?.id !== userId) {
         throw new Error("Vous n'avez pas la permission de supprimer cet utilisateur.");
