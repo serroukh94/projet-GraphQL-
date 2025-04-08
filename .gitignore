@@ -1,0 +1,48 @@
+# Fichiers de logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+error.log
+
+# Dossiers de dépendances
+node_modules/
+
+# Dossiers de build et de sortie
+dist/
+dist-ssr/
+build/
+coverage/
+
+# Fichiers et dossiers temporaires
+tmp/
+temp/
+
+# Résultats de tests E2E (ex : Cypress)
+cypress/videos/
+cypress/screenshots/
+
+# Fichiers de configuration personnels et IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Fichiers générés par la compilation TypeScript
+*.tsbuildinfo
+
+# Fichiers d'environnement (contenant des variables sensibles)
+.env
+.env.*.local
+
+# Autres fichiers locaux
+*.local
+
+# Fichiers système
+.DS_Store
+Thumbs.db
