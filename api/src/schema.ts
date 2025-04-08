@@ -1,4 +1,3 @@
-// src/schema.ts
 import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
@@ -15,6 +14,7 @@ export const typeDefs = gql`
     content: String!
     createdAt: String!
     author: User!
+    likesCount: Int!  # Champ calculé pour le nombre de likes
   }
 
   type UsersPagination {
@@ -24,14 +24,20 @@ export const typeDefs = gql`
     currentPage: Int!
   }
 
+  # Input pour la création d'un post
+  input CreatePostInput {
+    title: String!
+    content: String!
+    authorId: Int!
+  }
 
   type Query {
-    # Définition de la query getUser, attend un argument id de type Int
+    # Requêtes concernant les utilisateurs
     getUser(id: Int!): User
-
-    # La query getUsers retourne une pagination d'utilisateurs
     getUsers(page: Int): UsersPagination!
-
+    # Requêtes concernant les posts
+    posts(authorId: Int, sortByLikes: Boolean): [Post!]!
+    post(id: Int!): Post
   }
 
   input UpdateUserInput {
@@ -44,16 +50,13 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    # Inscription renvoie un token (String)
+    # Mutations concernant les utilisateurs
     signup(email: String!, password: String!, name: String): String!
-
-    # Login renvoie soit un token, soit l'utilisateur sans password
     login(email: String!, password: String!, getToken: Boolean): String
-
-    # Mise à jour d'un utilisateur
     updateUser(id: Int!, data: UpdateUserInput!): User!
-
-    # Suppression d'un utilisateur
     deleteUser(id: Int!): DeleteResponse!
+    # Mutations concernant les posts
+    createPost(data: CreatePostInput!): Post!
+    deletePost(id: Int!): Boolean!
   }
 `;

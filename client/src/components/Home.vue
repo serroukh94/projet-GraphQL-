@@ -1,18 +1,11 @@
-<!-- Chemin : client/src/components/Home.vue -->
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 
-/**
- * Query GraphQL : Récupération des articles avec filtres
- *  - authorId: ID (pour filtrer par auteur)
- *  - sortByLikes: Boolean (pour trier par nombre de likes)
- * Adapte cette query à ton schéma exact (noms de champs, etc.).
- */
-const GET_ARTICLES = gql`
-  query Articles($authorId: ID, $sortByLikes: Boolean) {
-    articles(filter: { authorId: $authorId, sortByLikes: $sortByLikes }) {
+const GET_POSTS = gql`
+  query GetPosts($authorId: Int, $sortByLikes: Boolean) {
+    posts(authorId: $authorId, sortByLikes: $sortByLikes) {
       id
       title
       content
@@ -27,20 +20,19 @@ const GET_ARTICLES = gql`
 `;
 
 // Variables de filtre
-const authorId = ref<string | null>(null);
+const authorId = ref<number | null>(null);
 const sortByLikes = ref(false);
 
 // Exécution de la query
-const { result, loading, error, refetch } = useQuery(GET_ARTICLES, () => ({
+const { result, loading, error, refetch } = useQuery(GET_POSTS, () => ({
   authorId: authorId.value,
   sortByLikes: sortByLikes.value,
 }));
 
 // Fonction pour mettre à jour les filtres
-function updateFilter(newAuthorId: string | null, newSortByLikes: boolean) {
+function updateFilter(newAuthorId: number | null, newSortByLikes: boolean) {
   authorId.value = newAuthorId;
   sortByLikes.value = newSortByLikes;
-  // "refetch" recharge la query avec les nouvelles variables
   refetch();
 }
 </script>
@@ -51,37 +43,35 @@ function updateFilter(newAuthorId: string | null, newSortByLikes: boolean) {
 
     <!-- Formulaire de filtres -->
     <div class="filters">
-      <!-- Filtrage par ID d'auteur -->
       <label>
         Auteur (ID) :
         <input
           type="text"
-          @input="updateFilter($event.target.value ? $event.target.value : null, sortByLikes)"
+          @input="(e) => updateFilter(parseInt((e.target as HTMLInputElement).value) || null, sortByLikes)"
           placeholder="Entrez un ID d'auteur"
         />
       </label>
 
-      <!-- Tri par popularité -->
       <label>
         Trier par nombre de likes :
-        <input type="checkbox" @change="updateFilter(authorId, $event.target.checked)" />
+        <input
+          type="checkbox"
+          @change="(e) => updateFilter(authorId, (e.target as HTMLInputElement).checked)"
+        />
       </label>
     </div>
 
-    <!-- Messages de chargement et d'erreur -->
-    <div v-if="loading">Chargement des articles...</div>
+    <div v-if="loading">Chargement des posts...</div>
     <div v-else-if="error">Erreur : {{ error.message }}</div>
-
-    <!-- Liste des articles -->
     <div v-else>
-      <div
-        v-for="article in result.articles"
-        :key="article.id"
-        class="article"
-      >
-        <h2>{{ article.title }}</h2>
-        <p>{{ article.content }}</p>
-        <p><small>Auteur : {{ article.author.name }} | Likes : {{ article.likesCount }}</small></p>
+      <div v-for="post in result.posts" :key="post.id" class="article">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.content }}</p>
+        <p>
+          <small>
+            Auteur : {{ post.author.name }} | Likes : {{ post.likesCount }}
+          </small>
+        </p>
         <hr />
       </div>
     </div>

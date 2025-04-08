@@ -1,19 +1,19 @@
 import { ApolloServer } from 'apollo-server';
-import { userResolvers } from './resolvers';
-import { config } from './config';
-import { getUserFromToken } from './utils/auth';
 import { typeDefs } from './schema';
+import { resolvers } from './resolvers';
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers: userResolvers,
-  context: ({ req }) => {
-    const token = req.headers.authorization || '';
-    const user = getUserFromToken(token);
-    return { user };
-  },
-});
+async function startServer() {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => {
+      // Si besoin, ajoutez ici la logique d'authentification (extraction du JWT)
+      return {};
+    },
+  });
 
-server.listen({ port: config.port }).then(({ url }) => {
+  const { url } = await server.listen({ port: 4000 });
   console.log(`Server ready at ${url}`);
-});
+}
+
+startServer();
