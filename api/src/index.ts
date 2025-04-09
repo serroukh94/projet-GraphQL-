@@ -1,5 +1,5 @@
 import { ApolloServer } from 'apollo-server';
-import { typeDefs } from './schema';
+import { typeDefs } from './schemas/userSchema';
 import { resolvers } from './resolvers';
 
 async function startServer() {

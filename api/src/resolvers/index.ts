@@ -1,9 +1,9 @@
 import { postResolvers } from './postResolvers';
-// importez ici d'autres résolveurs, par exemple userResolvers, etc.
+import { userResolvers } from './userResolvers';
 
 export const resolvers = [
   postResolvers,
-  // userResolvers,
+  userResolvers,
   // commentResolvers,
   // likeResolvers,
 ];
