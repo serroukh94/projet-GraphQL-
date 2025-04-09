@@ -1,25 +1,29 @@
-// import { gql } from 'apollo-server';
+// src/schemas/commentSchema.ts
+import { gql } from 'apollo-server';
 
-// export const commentTypeDefs = gql`
-//   type Comment {
-//     id: ID!
-//     content: String!
-//     createdAt: String!
-//     author: User!
-//     post: Post!
-//   }
+export const commentTypeDefs = gql`
+  # Définition du type Comment
+  type Comment {
+    id: Int!
+    content: String!
+    createdAt: String!
+    author: User!
+    post: Post!
+  }
 
-//   extend type Query {
-//     # Optionnel : récupère les commentaires d'un article
-//     comments(postId: Int!): [Comment!]!
-//   }
+  # Optionnel : une query pour récupérer les commentaires d'un article
+  extend type Query {
+    comments(postId: Int!): [Comment!]!
+  }
 
-//   input CreateCommentInput {
-//     content: String!
-//     postId: Int!
-//   }
+  # Input pour la création d'un commentaire
+  input CreateCommentInput {
+    content: String!
+    postId: Int!
+  }
 
-//   extend type Mutation {
-//     createComment(data: CreateCommentInput!): Comment!
-//   }
-// `;
+  # Mutation pour permettre à un utilisateur de commenter un article
+  extend type Mutation {
+    createComment(data: CreateCommentInput!): Comment!
+  }
+`;

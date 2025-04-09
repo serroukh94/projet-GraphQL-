@@ -168,25 +168,25 @@ export const publicationResolvers = {
   },
 
   // Resolver de champs personnalisés pour le type Post
-  // Post: {
-  //   // Résolution dynamique pour les commentaires
-  //   comments: async (parent: Post) => {
-  //     return await prisma.comment.findMany({
-  //       where: { postId: parent.id },
-  //       orderBy: { createdAt: 'desc' },
-  //     });
-  //   },
-  //   // Résolution dynamique pour les likes
-  //   likes: async (parent: Post) => {
-  //     return await prisma.like.findMany({
-  //       where: { postId: parent.id },
-  //     });
-  //   },
-  //   // Champ personnalisé pour le nombre de likes
-  //   likesCount: async (parent: Post) => {
-  //     return await prisma.like.count({
-  //       where: { postId: parent.id },
-  //     });
-  //   },
-  // },
+  Post: {
+    // Résolution dynamique pour les commentaires
+    comments: async (parent: Post) => {
+      return await prisma.comment.findMany({
+        where: { postId: parent.id },
+        orderBy: { createdAt: 'desc' },
+      });
+    },
+    // // Résolution dynamique pour les likes
+    // likes: async (parent: Post) => {
+    //   return await prisma.like.findMany({
+    //     where: { postId: parent.id },
+    //   });
+    // },
+    // // Champ personnalisé pour le nombre de likes
+    // likesCount: async (parent: Post) => {
+    //   return await prisma.like.count({
+    //     where: { postId: parent.id },
+    //   });
+    // },
+  },
 };

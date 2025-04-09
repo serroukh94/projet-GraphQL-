@@ -8,7 +8,7 @@ export const publicationTypeDefs = gql`
     content: String!
     createdAt: String!
     author: User!
-    # comments: [Comment!]!
+    comments: [Comment!]!
     # likes: [Like!]!
     # likesCount: Int!
   }
