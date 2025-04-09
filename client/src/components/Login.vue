@@ -46,7 +46,10 @@
             }
           })
           // On récupère le token
-          const token = res.data?.login
+          const token = res?.data?.login
+          if (!token) {
+            throw new Error('Login failed: No token received')
+          }
           // On stocke
           localStorage.setItem('token', token)
           // Redirection vers Home

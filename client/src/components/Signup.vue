@@ -36,7 +36,6 @@
       const password = ref('')
       const name = ref('')
       const error = ref('')
-  
       const router = useRouter()
   
       const { mutate: signup } = useMutation(SIGNUP_MUTATION)
@@ -44,21 +43,30 @@
       const signupHandler = async () => {
         try {
           error.value = ''
-          const res = await signup({
-            variables: {
-              email: email.value,
-              password: password.value,
-              name: name.value || null
-            }
+          // Log des variables pour voir ce qui est envoyé
+          console.log('Champs saisis:', { 
+            email: email.value, 
+            password: password.value, 
+            name: name.value 
           })
-          // On récupère le token renvoyé par "signup"
-          const token = res.data?.signup
-          // On stocke le token (localStorage, par exemple)
-          localStorage.setItem('token', token)
-          // Redirection vers la page Home
-          router.push('/home')
+          const { data } = await signup({
+            // On passe les variables directement (ou sous "variables: {...}" selon ta version)
+            email: email.value,
+            password: password.value,
+            name: name.value || null
+          })
+          console.log('Réponse de la mutation Signup:', data)
+          
+          if (!data || !data.signup) {
+            throw new Error('Le token n\'a pas été généré.')
+          }
+          
+          // Ici on stocke le token et on redirige vers la page de login
+          localStorage.setItem('token', data.signup)
+          router.push('/login')  // Redirige sur la page de connexion après inscription
         } catch (err: any) {
-          error.value = err.message
+          console.error('Erreur dans signupHandler:', err)
+          error.value = err.message || 'Erreur lors de l\'inscription.'
         }
       }
   
