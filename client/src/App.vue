@@ -4,6 +4,8 @@
     <router-link to="/home">Home</router-link>
     <router-link to="/login">Login</router-link>
     <router-link to="/signup">Signup</router-link>
+    <!-- Bouton de déconnexion -->
+    <LogoutButton />
   </nav>
 
   <!-- router-view est l'endroit où s'affiche le composant lié à la route -->
@@ -12,8 +14,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import LogoutButton from './components/LogoutButton.vue'
 
-export default defineComponent({})
+export default defineComponent({
+  components: {
+    LogoutButton
+  }
+})
 </script>
 
 <style scoped>
