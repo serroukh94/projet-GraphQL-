@@ -25,7 +25,7 @@ router.beforeEach((to, from, next) => {
   } 
   // Si pas de token et qu'on va sur /home => Redirige vers /signup
   else if (!token && to.path === '/home') {
-    next('/signup')
+    next('/login')
   } 
   else {
     next()
