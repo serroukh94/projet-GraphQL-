@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server';
 import { resolvers } from './resolvers';
-import { typeDefs } from './schema';
+import { typeDefs } from './schemas/schema';
 import { getUserFromToken } from './utils/auth';
 
 async function startServer() {
