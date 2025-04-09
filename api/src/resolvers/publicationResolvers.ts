@@ -176,17 +176,19 @@ export const publicationResolvers = {
         orderBy: { createdAt: 'desc' },
       });
     },
-    // // Résolution dynamique pour les likes
-    // likes: async (parent: Post) => {
-    //   return await prisma.like.findMany({
-    //     where: { postId: parent.id },
-    //   });
-    // },
-    // // Champ personnalisé pour le nombre de likes
-    // likesCount: async (parent: Post) => {
-    //   return await prisma.like.count({
-    //     where: { postId: parent.id },
-    //   });
-    // },
+    // Résolution dynamique pour les likes
+    likes: async (parent: Post) => {
+      return await prisma.like.findMany({
+        where: { postId: parent.id },
+      });
+    },
+    // Champ personnalisé pour le nombre de likes
+    likesCount: async (parent: Post): Promise<number> => {
+      const count = await prisma.like.count({
+        where: { postId: parent.id },
+      });
+      // S'assure de retourner 0 si count est null (ce qui ne devrait pas arriver, mais c'est pour sécurité)
+      return count ?? 0;
+    },
   },
 };

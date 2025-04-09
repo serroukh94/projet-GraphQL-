@@ -9,8 +9,8 @@ export const publicationTypeDefs = gql`
     createdAt: String!
     author: User!
     comments: [Comment!]!
-    # likes: [Like!]!
-    # likesCount: Int!
+    likes: [Like!]!
+    likesCount: Int!
   }
 
   # Pour la pagination, on retourne un objet qui contient la liste et des infos complémentaires
@@ -49,5 +49,7 @@ export const publicationTypeDefs = gql`
     createPublication(data: CreatePublicationInput!): Post!
     updatePublication(id: Int!, data: UpdatePublicationInput!): Post!
     deletePublication(id: Int!): DeleteResponse!
+    likePublication(postId: Int!): Post!
+    unlikePublication(postId: Int!): Post!
   }
 `;
