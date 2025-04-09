@@ -1,36 +1,70 @@
 <template>
-  <nav>
-    <!-- Liens de navigation vers les routes -->
-    <router-link to="/home">Home</router-link>
-    <router-link to="/login">Login</router-link>
-    <router-link to="/signup">Signup</router-link>
-    <!-- Bouton de déconnexion -->
-    <LogoutButton />
+  <nav class="navbar">
+    <div class="navbar-left">
+      <span class="brand">Mon Réseau</span>
+    </div>
+    <div class="navbar-right">
+      <template v-if="isAuthenticated">
+        <!-- Si connecté, on affiche le bouton Logout -->
+        <LogoutButton />
+      </template>
+      <template v-else>
+        <!-- Si non connecté, on affiche les liens Login et Signup -->
+        <router-link class="nav-link" to="/login">Login</router-link>
+        <router-link class="nav-link" to="/signup">Signup</router-link>
+      </template>
+    </div>
   </nav>
-
-  <!-- router-view est l'endroit où s'affiche le composant lié à la route -->
+  <!-- Affiche la page en fonction de la route -->
   <router-view />
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed } from 'vue'
 import LogoutButton from './components/LogoutButton.vue'
 
 export default defineComponent({
-  components: {
-    LogoutButton
+  components: { LogoutButton },
+  setup() {
+    const isAuthenticated = computed(() => {
+      return !!localStorage.getItem('token')
+    })
+    return { isAuthenticated }
   }
 })
 </script>
 
 <style scoped>
-nav {
-  background-color: #eee;
-  padding: 1rem;
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Dégradé de couleur pour un effet moderne */
+  background: linear-gradient(to right, #4e54c8, #8f94fb);
+  padding: 1rem 2rem;
+  color: #fff;
 }
-nav a {
-  margin-right: 1rem;
+
+.navbar-left .brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Liens de navigation */
+.nav-link {
+  margin-left: 1rem;
   text-decoration: none;
-  color: #333;
+  color: #fff;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #dfe6e9;
 }
 </style>
