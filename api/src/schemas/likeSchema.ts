@@ -7,4 +7,11 @@ export const likeTypeDefs = gql`
     user: User!
     post: Post!
   }
+
+  extend type Mutation {
+  likePublication(postId: Int!): Post!
+  unlikePublication(postId: Int!): Post!
+}
+
 `;
+

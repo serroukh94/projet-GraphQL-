@@ -1,4 +1,3 @@
-// src/resolvers/publicationResolvers.ts
 import { PrismaClient, Post } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -6,9 +5,6 @@ const ITEMS_PER_PAGE = 4;
 
 export const publicationResolvers = {
   Query: {
-    /**
-     * Récupère une liste paginée d'articles.
-     */
     getPublications: async (
       _: unknown,
       args: { page?: number },
@@ -23,22 +19,18 @@ export const publicationResolvers = {
       const page = args.page && args.page > 0 ? args.page : 1;
       const totalItems = await prisma.post.count();
       const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
       const publications = await prisma.post.findMany({
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * ITEMS_PER_PAGE,
         take: ITEMS_PER_PAGE,
         include: {
           author: true,
-          // On n'inclut pas directement les commentaires ou likes ici
-          // Si vous souhaitez charger ces relations, pensez à les inclure ou à définir des resolvers personnalisés pour Post.comments & Post.likes.
+          // Vous pouvez inclure les commentaires ici si besoin
         },
       });
-
       if (publications.length === 0) {
         throw new Error('Aucune publication disponible.');
       }
-
       return {
         totalItems,
         totalPages,
@@ -47,10 +39,6 @@ export const publicationResolvers = {
         publications,
       };
     },
-
-    /**
-     * Récupère un article par son ID.
-     */
     getPublication: async (
       _: unknown,
       args: { id: number }
@@ -59,7 +47,6 @@ export const publicationResolvers = {
         where: { id: args.id },
         include: {
           author: true,
-          // Optionnel : charger les commentaires et les likes
           comments: true,
           likes: true,
         },
@@ -72,9 +59,6 @@ export const publicationResolvers = {
   },
 
   Mutation: {
-    /**
-     * Crée une nouvelle publication.
-     */
     createPublication: async (
       _: unknown,
       args: { data: { text: string; title?: string } },
@@ -86,9 +70,7 @@ export const publicationResolvers = {
       if (!context.user) {
         throw new Error('Authentification requise.');
       }
-
-      const title = args.data.title ?? 'Publication'; // Titre par défaut si non fourni
-
+      const title = args.data.title ?? 'Publication';
       const newPost = await prisma.post.create({
         data: {
           title,
@@ -97,15 +79,10 @@ export const publicationResolvers = {
         },
         include: {
           author: true,
-          // Vous pouvez choisir d'inclure les commentaires et likes si nécessaire
         },
       });
       return newPost;
     },
-
-    /**
-     * Met à jour un article existant.
-     */
     updatePublication: async (
       _: unknown,
       args: { id: number; data: { title?: string; content?: string } },
@@ -114,8 +91,6 @@ export const publicationResolvers = {
       if (!context.user) {
         throw new Error('Authentification requise.');
       }
-
-      // Vérifier que l'article existe et qu'il appartient à l'utilisateur
       const publication = await prisma.post.findUnique({
         where: { id: args.id },
       });
@@ -125,21 +100,16 @@ export const publicationResolvers = {
       if (publication.authorId !== context.user.id) {
         throw new Error("Vous n'êtes pas autorisé à modifier cet article.");
       }
-
       const updatedPublication = await prisma.post.update({
         where: { id: args.id },
         data: {
-          title: args.data.title,      // Si défini, le titre sera mis à jour
-          content: args.data.content,  // Même chose pour le contenu
+          title: args.data.title,
+          content: args.data.content,
         },
         include: { author: true },
       });
       return updatedPublication;
     },
-
-    /**
-     * Supprime un article.
-     */
     deletePublication: async (
       _: unknown,
       args: { id: number },
@@ -148,8 +118,6 @@ export const publicationResolvers = {
       if (!context.user) {
         throw new Error('Authentification requise.');
       }
-
-      // Vérifier que l'article existe et qu'il appartient à l'utilisateur
       const publication = await prisma.post.findUnique({
         where: { id: args.id },
       });
@@ -159,36 +127,102 @@ export const publicationResolvers = {
       if (publication.authorId !== context.user.id) {
         throw new Error("Vous n'êtes pas autorisé à supprimer cet article.");
       }
-
       await prisma.post.delete({
         where: { id: args.id },
       });
       return { message: "L'article a été supprimé avec succès." };
     },
+    // Mutations pour le système de Like
+    likePublication: async (
+      _: unknown,
+      args: { postId: number },
+      context: { user?: { id: number } }
+    ): Promise<Post> => {
+      if (!context.user) {
+        throw new Error('Authentification requise.');
+      }
+      const existingLike = await prisma.like.findFirst({
+        where: {
+          postId: args.postId,
+          userId: context.user.id,
+        },
+      });
+      if (existingLike) {
+        throw new Error("Vous avez déjà liké cet article.");
+      }
+      await prisma.like.create({
+        data: {
+          post: { connect: { id: args.postId } },
+          user: { connect: { id: context.user.id } },
+        },
+      });
+      const post = await prisma.post.findUnique({
+        where: { id: args.postId },
+        include: { author: true },
+      });
+      if (!post) {
+        throw new Error("Article non trouvé.");
+      }
+      return post;
+    },
+    unlikePublication: async (
+      _: unknown,
+      args: { postId: number },
+      context: { user?: { id: number } }
+    ): Promise<Post> => {
+      if (!context.user) {
+        throw new Error('Authentification requise.');
+      }
+      const existingLike = await prisma.like.findFirst({
+        where: {
+          postId: args.postId,
+          userId: context.user.id,
+        },
+      });
+      if (!existingLike) {
+        throw new Error("Vous n'avez pas liké cet article.");
+      }
+      await prisma.like.delete({
+        where: { id: existingLike.id },
+      });
+      const post = await prisma.post.findUnique({
+        where: { id: args.postId },
+        include: { author: true },
+      });
+      if (!post) {
+        throw new Error("Article non trouvé.");
+      }
+      return post;
+    },
   },
 
-  // Resolver de champs personnalisés pour le type Post
   Post: {
-    // Résolution dynamique pour les commentaires
     comments: async (parent: Post) => {
       return await prisma.comment.findMany({
         where: { postId: parent.id },
         orderBy: { createdAt: 'desc' },
       });
     },
-    // Résolution dynamique pour les likes
     likes: async (parent: Post) => {
       return await prisma.like.findMany({
         where: { postId: parent.id },
       });
     },
-    // Champ personnalisé pour le nombre de likes
     likesCount: async (parent: Post): Promise<number> => {
       const count = await prisma.like.count({
         where: { postId: parent.id },
       });
-      // S'assure de retourner 0 si count est null (ce qui ne devrait pas arriver, mais c'est pour sécurité)
       return count ?? 0;
+    },
+    isLiked: async (parent: Post, _: unknown, context: { user?: { id: number } }): Promise<boolean> => {
+      if (!context.user) return false;
+      const existingLike = await prisma.like.findFirst({
+        where: {
+          postId: parent.id,
+          userId: context.user.id,
+        },
+      });
+      return Boolean(existingLike);
     },
   },
 };

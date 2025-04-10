@@ -8,15 +8,6 @@ export const typeDefs = gql`
     posts: [Post!]!
   }
 
-  type Post {
-    id: Int!
-    title: String!
-    content: String!
-    createdAt: String!
-    author: User!
-    likesCount: Int!  # Champ calculé pour le nombre de likes
-  }
-
   type UsersPagination {
     users: [User!]!
     total: Int!

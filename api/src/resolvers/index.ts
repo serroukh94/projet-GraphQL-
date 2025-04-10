@@ -2,7 +2,6 @@
 import { userResolvers } from './userResolvers';
 import { publicationResolvers } from './publicationResolvers';
 import { commentResolvers } from './commentResolvers';
-import { likeResolvers } from './likeResolvers';
 
 export const resolvers = {
   Query: {
@@ -14,6 +13,9 @@ export const resolvers = {
     ...userResolvers.Mutation,
     ...publicationResolvers.Mutation,
     ...commentResolvers.Mutation,
-    ...likeResolvers.Mutation,
+  },
+
+  Post: {
+    ...publicationResolvers.Post,
   },
 };

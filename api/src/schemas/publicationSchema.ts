@@ -11,6 +11,7 @@ export const publicationTypeDefs = gql`
     comments: [Comment!]!
     likes: [Like!]!
     likesCount: Int!
+    isLiked: Boolean! 
   }
 
   # Pour la pagination, on retourne un objet qui contient la liste et des infos complémentaires
