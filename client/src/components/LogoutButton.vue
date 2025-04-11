@@ -8,9 +8,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function logout() {
-  // Supprime le token du localStorage
   localStorage.removeItem('token')
-  // Redirige vers la page Signup (ou Login, selon ton choix)
   router.push('/signup')
 }
 </script>
@@ -26,6 +24,7 @@ function logout() {
   font-size: 1rem;
   transition: background-color 0.2s ease;
 }
+
 .logout-button:hover {
   background-color: #d32f2f;
 }

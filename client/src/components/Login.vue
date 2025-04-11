@@ -39,11 +39,15 @@ export default defineComponent({
     const loginHandler = async () => {
       try {
         error.value = ''
-        const { data } = await login({
+        const result = await login({
           email: email.value,
           password: password.value,
           getToken: true // Toujours récupérer le token
         })
+        if (!result || !result.data) {
+          throw new Error('Login failed: No data received')
+        }
+        const { data } = result
         const token = data?.login
         if (!token) {
           throw new Error('Login failed: No token received')
