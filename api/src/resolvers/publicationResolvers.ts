@@ -9,19 +9,11 @@ export const publicationResolvers = {
       args: { authorId?: number | null; sortByLikes?: boolean }
     ): Promise<(Post & { likesCount: number })[]> => {
       const whereClause = args.authorId != null ? { authorId: args.authorId } : {};
-
       const posts = await prisma.post.findMany({
         where: whereClause,
-        orderBy: args.sortByLikes
-          ? { likes: { _count: 'desc' } }
-          : { createdAt: 'desc' },
-        include: {
-          author: true,
-          comments: true,
-          _count: { select: { likes: true } },
-        },
+        orderBy: args.sortByLikes ? { likes: { _count: 'desc' } } : { createdAt: 'desc' },
+        include: { author: true, comments: true, _count: { select: { likes: true } } },
       });
-
       return posts.map(post => ({
         ...post,
         likesCount: post._count.likes,
@@ -34,19 +26,10 @@ export const publicationResolvers = {
     ): Promise<Post & { likesCount: number }> => {
       const publication = await prisma.post.findUnique({
         where: { id: args.id },
-        include: {
-          author: true,
-          comments: true,
-          _count: { select: { likes: true } },
-        },
+        include: { author: true, comments: true, _count: { select: { likes: true } } },
       });
-
       if (!publication) throw new Error('Publication non trouvée.');
-
-      return {
-        ...publication,
-        likesCount: publication._count.likes,
-      };
+      return { ...publication, likesCount: publication._count.likes };
     },
   },
 
@@ -58,8 +41,7 @@ export const publicationResolvers = {
     ): Promise<Post> => {
       if (!args.data.text) throw new Error('Le champ text est nécessaire!');
       if (!context.user) throw new Error('Authentification requise.');
-
-      return prisma.post.create({
+      return await prisma.post.create({
         data: {
           title: args.data.title ?? 'Publication',
           content: args.data.text,
@@ -75,12 +57,10 @@ export const publicationResolvers = {
       context: { user?: { id: number } }
     ): Promise<Post> => {
       if (!context.user) throw new Error('Authentification requise.');
-
       const publication = await prisma.post.findUnique({ where: { id: args.id } });
       if (!publication) throw new Error("L'article n'existe pas.");
       if (publication.authorId !== context.user.id) throw new Error("Non autorisé.");
-
-      return prisma.post.update({
+      return await prisma.post.update({
         where: { id: args.id },
         data: { ...args.data },
         include: { author: true, comments: true, likes: true },
@@ -93,24 +73,24 @@ export const publicationResolvers = {
       context: { user?: { id: number } }
     ): Promise<{ message: string }> => {
       if (!context.user) throw new Error('Authentification requise.');
-
       const publication = await prisma.post.findUnique({ where: { id: args.id } });
       if (!publication) throw new Error("L'article n'existe pas.");
       if (publication.authorId !== context.user.id) throw new Error("Non autorisé.");
-
       await prisma.post.delete({ where: { id: args.id } });
       return { message: "L'article a été supprimé avec succès." };
     },
   },
 
+  // Modification ici : filtrer strictement les commentaires dont l'auteur existe et possède un id
   Post: {
-    comments: async (parent: Post) =>
-      prisma.comment.findMany({ where: { postId: parent.id } }),
-
-    likes: async (parent: Post) =>
-      prisma.like.findMany({ where: { postId: parent.id } }),
-
-    likesCount: async (parent: Post): Promise<number> =>
-      prisma.like.count({ where: { postId: parent.id } }),
+    comments: async (parent: Post) => {
+      const comments = await prisma.comment.findMany({
+        where: { postId: parent.id },
+        include: { author: true },
+      });
+      return comments.filter(comment => comment.author && comment.author.id != null);
+    },
+    likes: async (parent: Post) => await prisma.like.findMany({ where: { postId: parent.id } }),
+    likesCount: async (parent: Post): Promise<number> => await prisma.like.count({ where: { postId: parent.id } }),
   },
 };

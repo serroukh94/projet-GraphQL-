@@ -1,6 +1,4 @@
-import { gql } from 'apollo-server';
-
-export const likeTypeDefs = gql`
+export const likeTypeDefs = /* GraphQL */ `
   type Like {
     id: Int!
     post: Post!
@@ -8,16 +6,8 @@ export const likeTypeDefs = gql`
     createdAt: String!
   }
 
-  type Mutation {
-    likePublication(postId: Int!): Like!
-    unlikePublication(postId: Int!): MessageResponse!
-  }
-
-  type Query {
-    likes(postId: Int!): [Like!]!
-  }
-
-  type MessageResponse {
-    message: String!
+  extend type Mutation {
+    likePublication(postId: Int!): Post!
+    unlikePublication(postId: Int!): Post!
   }
 `;

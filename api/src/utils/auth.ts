@@ -1,12 +1,14 @@
-import { verifyToken, MyJwtPayload } from './jwt';
+import jwt from 'jsonwebtoken';
 
-export const getUserFromToken = (token: string): MyJwtPayload | null => {
-  if (token.startsWith('Bearer ')) {
-    token = token.slice(7);
-  }
+const JWT_SECRET = process.env.JWT_SECRET || 'votre_clé_secrète';
+
+export function getUserFromToken(token: string) {
   try {
-    return verifyToken(token);
+    if (token) {
+      return jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+    }
+    return null;
   } catch (error) {
     return null;
   }
-};
+}
