@@ -1,34 +1,20 @@
-import { gql } from 'apollo-server';
-
-export const typeDefs = gql`
+export const userTypeDefs = /* GraphQL */ `
   type User {
     id: Int!
     email: String!
+    password: String!
     name: String
     posts: [Post!]!
+    comments: [Comment!]!
+    likes: [Like!]!
+    createdAt: String!
   }
 
-  type UsersPagination {
+  type UserPagination {
     users: [User!]!
     total: Int!
     totalPages: Int!
     currentPage: Int!
-  }
-
-  # Input pour la création d'un post
-  input CreatePostInput {
-    title: String!
-    content: String!
-    authorId: Int!
-  }
-
-  type Query {
-    # Requêtes concernant les utilisateurs
-    getUser(id: Int!): User
-    getUsers(page: Int): UsersPagination!
-    # Requêtes concernant les posts
-    posts(authorId: Int, sortByLikes: Boolean): [Post!]!
-    post(id: Int!): Post
   }
 
   input UpdateUserInput {
@@ -36,18 +22,15 @@ export const typeDefs = gql`
     name: String
   }
 
-  type DeleteResponse {
-    message: String!
+  extend type Query {
+    getUser(id: Int!): User
+    getUsers(page: Int): UserPagination
   }
 
-  type Mutation {
-    # Mutations concernant les utilisateurs
+  extend type Mutation {
     signup(email: String!, password: String!, name: String): String!
-    login(email: String!, password: String!, getToken: Boolean): String
+    login(email: String!, password: String!, getToken: Boolean): String!
     updateUser(id: Int!, data: UpdateUserInput!): User!
-    deleteUser(id: Int!): DeleteResponse!
-    # Mutations concernant les posts
-    createPost(data: CreatePostInput!): Post!
-    deletePost(id: Int!): Boolean!
+    deleteUser(id: Int!): DeletionMessage!
   }
 `;

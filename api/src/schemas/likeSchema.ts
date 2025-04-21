@@ -1,11 +1,14 @@
-import { gql } from 'apollo-server';
-
-export const likeTypeDefs = gql`
+export const likeTypeDefs = /* GraphQL */ `
   type Like {
     id: Int!
-    createdAt: String!
-    user: User!
     post: Post!
+    user: User!
+    createdAt: String!
+  }
+
+  extend type Mutation {
+    likePublication(postId: Int!): Post!
+    unlikePublication(postId: Int!): Post!
   }
 
   extend type Mutation {

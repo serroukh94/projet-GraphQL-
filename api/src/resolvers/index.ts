@@ -1,4 +1,3 @@
-// src/resolvers/index.ts
 import { userResolvers } from './userResolvers';
 import { publicationResolvers } from './publicationResolvers';
 import { commentResolvers } from './commentResolvers';
@@ -18,4 +17,5 @@ export const resolvers = {
   Post: {
     ...publicationResolvers.Post,
   },
+ 
 };

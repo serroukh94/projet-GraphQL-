@@ -42,38 +42,23 @@ export default defineComponent({
     const signupHandler = async () => {
       try {
         error.value = ''
-        console.log('Champs saisis:', {
+        const result = await signup({
           email: email.value,
           password: password.value,
-          name: name.value
+          name: name.value || null,
         })
-        const { data } = await signup({
-          email: email.value,
-          password: password.value,
-          name: name.value || null
-        })
-        console.log('Réponse de la mutation Signup:', data)
-
+        const data = result?.data
         if (!data || !data.signup) {
           throw new Error("Le token n'a pas été généré.")
         }
-
-        // Stockage du token, puis redirection vers /login
         localStorage.setItem('token', data.signup)
         router.push('/login')
       } catch (err: any) {
-        console.error('Erreur dans signupHandler:', err)
         error.value = err.message || "Erreur lors de l'inscription."
       }
     }
 
-    return {
-      email,
-      password,
-      name,
-      error,
-      signupHandler
-    }
+    return { email, password, name, error, signupHandler }
   }
 })
 </script>
@@ -82,10 +67,10 @@ export default defineComponent({
 .auth-container {
   max-width: 400px;
   margin: 2rem auto;
-  background-color: #f9f9f9; /* Couleur de fond légèrement grisée */
-  border-radius: 8px; /* Coins arrondis du cadre */
-  padding: 2rem; /* Espace intérieur */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Légère ombre */
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .auth-container h1 {

@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server';
-import { resolvers } from './resolvers';
 import { typeDefs } from './schemas/schema';
+import { resolvers } from './resolvers';
 import { getUserFromToken } from './utils/auth';
 
 async function startServer() {
@@ -10,7 +10,7 @@ async function startServer() {
     context: ({ req }) => {
       const token = req.headers.authorization || '';
       const user = getUserFromToken(token);
-      console.log('user dans le contexte:', user); 
+      console.log('user dans le contexte:', user);
       return { user };
     },
   });
